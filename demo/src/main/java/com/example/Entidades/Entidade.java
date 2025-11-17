@@ -1,35 +1,29 @@
 package com.example.Entidades;
 
-public class Entidade {
-    private  int id; 
-    private String email;
-    private String senha;
+import java.util.List;
 
-    
-    public Entidade(int id, String email, String senha) {
-        this.id = id;
+public class Entidade {
+    private String email;
+    private List<Localizacao> localizacoes;
+
+    public Entidade(){
+        
+    }
+    public Entidade(String email, List<Localizacao> localizacoes) {
         this.email = email;
-        this.senha = senha;
+        this.localizacoes = localizacoes;
     }
-    
-    public int getId() {
-        return id;
-    }
-    public void setId(int id) {
-        this.id = id;
-    }
+
     public String getEmail() {
         return email;
     }
     public void setEmail(String email) {
         this.email = email;
     }
-    public String getSenha() {
-        return senha;
+    public List<Localizacao> getLocalizacoes() {
+        return localizacoes;
     }
-    public void setSenha(String senha) {
-        this.senha = senha;
-    }
-
-    
+    public void setLocalizacoes(List<Localizacao> localizacoes) {
+        this.localizacoes = localizacoes;
+    }  
 }

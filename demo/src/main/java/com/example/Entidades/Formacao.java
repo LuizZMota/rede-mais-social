@@ -5,13 +5,15 @@ public class Formacao {
     public String profissao;
     public String curso;
 
-    
+    public Formacao(){
+        
+    }
     public Formacao(String tipo, String profissao, String curso) {
         this.tipo = tipo;
         this.profissao = profissao;
         this.curso = curso;
     }
-    
+
     public String getTipo() {
         return tipo;
     }

@@ -1,5 +1,7 @@
 package com.example.Entidades;
 
+
+
 public class Habilidades{
     public String habilidade;
     public String status;

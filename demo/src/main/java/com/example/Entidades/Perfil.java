@@ -1,19 +1,29 @@
 package com.example.Entidades;
 
+import java.util.List;
+
 public class Perfil {
-    public String status;
+    private List<Interesses> interesses;
+    private List<Habilidades> habilidades;
 
-    public Perfil(String status) {
-        this.status = status;
+    public Perfil(){
+        
+    }
+    public Perfil(List<Interesses> interesses, List<Habilidades> habilidades) {
+        this.interesses = interesses;
+        this.habilidades = habilidades;
     }
 
-    public String getStatus() {
-        return status;
+    public List<Interesses> getInteresses() {
+        return interesses;
     }
-
-    public void setStatus(String status) {
-        this.status = status;
+    public void setInteresses(List<Interesses> interesses) {
+        this.interesses = interesses;
     }
-
-    
+    public List<Habilidades> getHabilidades() {
+        return habilidades;
+    }
+    public void setHabilidades(List<Habilidades> habilidades) {
+        this.habilidades = habilidades;
+    }
 }

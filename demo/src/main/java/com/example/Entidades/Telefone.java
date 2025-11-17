@@ -1,18 +1,18 @@
 package com.example.Entidades;
 
 public class Telefone {
-    public int numero;
+    public String numero;
     public String tipo;
 
-    public Telefone(int numero, String tipo) {
+    public Telefone(String numero, String tipo) {
         this.numero = numero;
         this.tipo = tipo;
     }
 
-    public int getNumero() {
+    public String getNumero() {
         return numero;
     }
-    public void setNumero(int numero) {
+    public void setNumero(String numero) {
         this.numero = numero;
     }
     public String getTipo() {

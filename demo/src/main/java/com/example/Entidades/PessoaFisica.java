@@ -1,5 +1,42 @@
 package com.example.Entidades;
 
-public class PessoaFisica {
+import java.util.List;
+
+public class PessoaFisica extends Entidade{
+    private String cpf;
+    private Identidade identidade; 
+    private List<Formacao> formacoes;
+
+    public PessoaFisica(){
+
+    }
+    public PessoaFisica(String email, List<Localizacao> localizacoes, String cpf, Identidade identidade,
+            List<Formacao> formacoes) {
+        super(email, localizacoes);
+        this.cpf = cpf;
+        this.identidade = identidade;
+        this.formacoes = formacoes;
+    }
+    public String getCpf() {
+        return cpf;
+    }
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
+    }
+    public Identidade getIdentidade() {
+        return identidade;
+    }
+    public void setIdentidade(Identidade identidade) {
+        this.identidade = identidade;
+    }
+    public List<Formacao> getFormacao() {
+        return formacoes;
+    }
+    public void setFormacao(List<Formacao> formacoes) {
+        this.formacoes = formacoes;
+    }
+
+    
+
     
 }
