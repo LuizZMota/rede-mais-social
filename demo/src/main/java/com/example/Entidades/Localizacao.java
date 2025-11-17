@@ -1,5 +1,5 @@
 package com.example.Entidades;
 
-public class Recomendacao {
+public class Localizacao {
     
 }
