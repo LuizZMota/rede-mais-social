@@ -26,13 +26,15 @@ public class MainScreen extends Base {
         cadastroButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Aqui você chamaria a tela de cadastro
+                // ✅ CORREÇÃO: Inicia a tela de cadastro de afiliação.
+                new FronteiraAfiliacao();
             }
         });
 
         loginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                dispose(); // Fecha a MainScreen
                 new LoginScreen(); // chamar a tela de login estilizada
             }
         });

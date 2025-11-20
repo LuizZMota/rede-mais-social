@@ -18,7 +18,7 @@ public class FronteiraAfiliacao extends Base {
     private JRadioButton radioCpf;
     private JRadioButton radioCnpj;
     private JTextField txtCpf;
-    private JTextField txtCnpj; // Campo para CNPJ
+    private JTextField txtCnpj;
     private JTextField txtNome;
     private JTextField txtSexo;
     private JTextField txtDataNascimento;
@@ -44,7 +44,7 @@ public class FronteiraAfiliacao extends Base {
     // --- Constantes para o CardLayout ---
     private static final String TELA_EMAIL_TIPO = "TELA_EMAIL_TIPO";
     private static final String TELA_CPF = "TELA_CPF";
-    private static final String TELA_CNPJ = "TELA_CNPJ"; // Tela para CNPJ
+    private static final String TELA_CNPJ = "TELA_CNPJ";
     private static final String TELA_DADOS_PESSOAIS = "TELA_DADOS_PESSOAIS";
     private static final String TELA_ENDERECO_RESIDENCIAL = "TELA_ENDERECO_RESIDENCIAL";
     private static final String TELA_ENDERECO_COMERCIAL = "TELA_ENDERECO_COMERCIAL";
@@ -65,7 +65,7 @@ public class FronteiraAfiliacao extends Base {
         // --- Adiciona todas as telas ao CardLayout ---
         mainContent.add(createEmailTipoPanel(), TELA_EMAIL_TIPO);
         mainContent.add(createCpfPanel(), TELA_CPF);
-        mainContent.add(createCnpjPanel(), TELA_CNPJ); // Adiciona a tela de CNPJ
+        mainContent.add(createCnpjPanel(), TELA_CNPJ);
         mainContent.add(createDadosPessoaisPanel(), TELA_DADOS_PESSOAIS);
         mainContent.add(createEnderecoResidencialPanel(), TELA_ENDERECO_RESIDENCIAL);
         mainContent.add(createEnderecoComercialPanel(), TELA_ENDERECO_COMERCIAL);
@@ -97,7 +97,6 @@ public class FronteiraAfiliacao extends Base {
         radioCpf = new JRadioButton("Pessoa Física (CPF)");
         radioCpf.setSelected(true);
         radioCnpj = new JRadioButton("Pessoa Jurídica (CNPJ)");
-        radioCnpj.setSelected(true);
         ButtonGroup group = new ButtonGroup();
         group.add(radioCpf);
         group.add(radioCnpj);
@@ -184,7 +183,7 @@ public class FronteiraAfiliacao extends Base {
                 JOptionPane.showMessageDialog(this, "Candidato Novo. Prossiga com o cadastro.");
                 controller.iniciarNovoCandidato(cnpj, email);
                 setTitle("Afiliação - Etapa 2/4");
-                cardLayout.show(mainContent, TELA_DADOS_PESSOAIS); // Futuramente, pode ir para uma tela de dados de PJ
+                cardLayout.show(mainContent, TELA_DADOS_PESSOAIS);
             }
         });
 
@@ -236,15 +235,15 @@ public class FronteiraAfiliacao extends Base {
             String sexo = txtSexo.getText();
             String dataNascimento = txtDataNascimento.getText();
             String nacionalidade = (String) comboNacionalidade.getSelectedItem();
-            // A profissão ainda não está sendo usada no controller, mas coletamos o dado.
             String profissao = txtProfissao.getText(); 
-
-            controller.registrarDadosCompletos(
-                nome, sexo, dataNascimento, nacionalidade, true, false, 
-                Arrays.asList(new Formacao("Superior", "Engenharia", "UFSC"))
-            );
-            setTitle("Afiliação - Etapa 3/4");
-            cardLayout.show(mainContent, TELA_ENDERECO_RESIDENCIAL);
+            
+            // ✅ CORREÇÃO: Verificar se os dados foram registrados com sucesso
+            if (controller.registrarDadosCompletos(nome, sexo, dataNascimento, nacionalidade)) {
+                setTitle("Afiliação - Etapa 3/4");
+                cardLayout.show(mainContent, TELA_ENDERECO_RESIDENCIAL);
+            } else {
+                JOptionPane.showMessageDialog(this, "Data de nascimento inválida! Por favor, use o formato DD/MM/AAAA.", "Erro de Formato", JOptionPane.ERROR_MESSAGE);
+            }
         });
 
         btnVoltar = createButton("Voltar", Color.GRAY);
@@ -289,7 +288,6 @@ public class FronteiraAfiliacao extends Base {
 
         btnProximaEtapa = createButton("Próxima Etapa", new Color(60, 179, 113));
         btnProximaEtapa.addActionListener(e -> {
-            // Aqui você pode registrar os dados de endereço no controller
             setTitle("Afiliação - Etapa 3/4");
             cardLayout.show(mainContent, TELA_ENDERECO_COMERCIAL);
         });
@@ -330,7 +328,6 @@ public class FronteiraAfiliacao extends Base {
 
         btnProximaEtapa = createButton("Próxima Etapa", new Color(60, 179, 113));
         btnProximaEtapa.addActionListener(e -> {
-            // Registrar dados de endereço comercial
             setTitle("Afiliação - Etapa 3/4");
             cardLayout.show(mainContent, TELA_INTERESSES);
         });
@@ -361,7 +358,6 @@ public class FronteiraAfiliacao extends Base {
         btnProximaEtapa = createButton("Próxima Etapa", new Color(60, 179, 113));
         btnProximaEtapa.addActionListener(e -> {
             List<String> selectedInteresses = listInteresses.getSelectedValuesList();
-            // Registrar interesses no controller
             setTitle("Afiliação - Etapa 3/4");
             cardLayout.show(mainContent, TELA_HABILIDADES);
         });
@@ -412,8 +408,10 @@ public class FronteiraAfiliacao extends Base {
         panel.add(createTitle("4. Termo de Compromisso"));
         addVerticalSpace(panel, 20);
         
-        JTextArea txtTermo = new JTextArea("Eu, o Candidato, aceito as diretrizes...");
+        JTextArea txtTermo = new JTextArea("Eu, o Candidato, aceito as diretrizes da Rede Mais Social e concordo em seguir todas as normas estabelecidas pela plataforma. Declaro que as informações fornecidas são verdadeiras.");
         txtTermo.setEditable(false);
+        txtTermo.setLineWrap(true);
+        txtTermo.setWrapStyleWord(true);
         JScrollPane scrollPane = new JScrollPane(txtTermo);
         scrollPane.setMaximumSize(new Dimension(300, 200));
         scrollPane.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -429,9 +427,14 @@ public class FronteiraAfiliacao extends Base {
         btnAceitar.addActionListener(e -> {
             controller.registrarTermoAceite();
             boolean receberAtualizacoes = checkReceberAtualizacoes.isSelected();
+            
+            // ✅ CORREÇÃO: Chamar APENAS UMA VEZ com status correto
             controller.finalizarAfilicao("Aguardando Validação", receberAtualizacoes);
             
-            JOptionPane.showMessageDialog(this, "Afiliação quase concluída! Um código foi enviado para o seu e-mail. Por favor, valide-o a seguir.");
+            JOptionPane.showMessageDialog(this, 
+                "Afiliação quase concluída!\n\nUm código de validação foi enviado para o seu e-mail.\nVerifique o console e insira o código na próxima tela.", 
+                "Código Enviado", 
+                JOptionPane.INFORMATION_MESSAGE);
             
             setTitle("Validação de E-mail");
             cardLayout.show(mainContent, TELA_VALIDACAO_EMAIL);
@@ -451,7 +454,12 @@ public class FronteiraAfiliacao extends Base {
         panel.add(createTitle("Validação de E-mail"));
         addVerticalSpace(panel, 20);
 
-        panel.add(createLabel("Insira o código recebido por e-mail:", Component.LEFT_ALIGNMENT));
+        JLabel lblInstrucoes = new JLabel("<html><center>Verifique o console da aplicação<br>e insira o código de 8 caracteres:</center></html>");
+        lblInstrucoes.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panel.add(lblInstrucoes);
+        addVerticalSpace(panel, 15);
+
+        panel.add(createLabel("Código de Validação:", Component.LEFT_ALIGNMENT));
         txtCodigoValidacao = createTextField();
         panel.add(txtCodigoValidacao);
         addVerticalSpace(panel, 30);
@@ -459,16 +467,24 @@ public class FronteiraAfiliacao extends Base {
         JButton btnValidar = createButton("Validar", new Color(60, 179, 113));
         btnValidar.addActionListener(e -> {
             String codigo = txtCodigoValidacao.getText();
+            
             if (controller.validarCodigoEmail(codigo)) {
-                JOptionPane.showMessageDialog(this, "E-mail validado com sucesso! Cadastro concluído.");
+                // ✅ CORREÇÃO: NÃO chamar finalizarAfilicao novamente!
+                // O status já foi atualizado dentro de validarCodigoEmail
+                JOptionPane.showMessageDialog(this, 
+                    "E-mail validado com sucesso!\n\nSeu cadastro foi concluído e está aguardando aprovação da Rede Mais Social.", 
+                    "Validação Concluída", 
+                    JOptionPane.INFORMATION_MESSAGE);
                 this.dispose();
-                // new FronteiraLogin().setVisible(true); // Descomente e ajuste para abrir a tela de login
+                new MainScreen(); 
             } else {
-                JOptionPane.showMessageDialog(this, "Código inválido. Tente novamente.", "Erro de Validação", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, 
+                    "Código inválido ou expirado.\n\nVerifique se digitou corretamente e tente novamente.", 
+                    "Erro de Validação", 
+                    JOptionPane.ERROR_MESSAGE);
             }
         });
 
-        // Não há botão de voltar nesta tela para forçar a validação
         JPanel buttonWrapper = new JPanel(new FlowLayout(FlowLayout.CENTER));
         buttonWrapper.setOpaque(false);
         buttonWrapper.add(btnValidar);
@@ -499,15 +515,6 @@ public class FronteiraAfiliacao extends Base {
     public JLabel createLabel(String text, float alignment) {
         JLabel label = new JLabel(text);
         label.setAlignmentX(alignment);
-        // Ajusta o alinhamento do contêiner do label para corresponder ao campo de texto
-        JPanel wrapper = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        wrapper.setAlignmentX(Component.CENTER_ALIGNMENT);
-        wrapper.setMaximumSize(new Dimension(300, 20));
-        wrapper.setOpaque(false);
-        wrapper.add(label);
-        // Retornar o wrapper ou o label? Para consistência, vamos manter o label
-        // mas a estrutura do Base pode precisar de ajuste se o alinhamento não bater.
-        // Por enquanto, o alinhamento do próprio label é o mais importante.
         return label;
     }
 

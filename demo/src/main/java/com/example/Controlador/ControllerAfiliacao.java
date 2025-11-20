@@ -6,6 +6,8 @@ import com.example.Entidades.*;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 public class ControllerAfiliacao {
@@ -37,7 +39,7 @@ public class ControllerAfiliacao {
                 this.entidadeAtual.setId(idEntidade);
                 this.entidadeAtual.setEmail(email);
                 
-                gerarEEnviarCodigoValidacao(); // Re-enviar código para usuário existente
+                gerarEEnviarCodigoValidacao(conn); // ✅ CORREÇÃO: Passar a conexão existente
                 return true;
             }
         } catch (SQLException e) {
@@ -54,6 +56,7 @@ public class ControllerAfiliacao {
         if (VerificadorCP.VerificationCpf(cpfOuCnpj)) {
             this.pessoaFisicaAtual = new PessoaFisica();
             this.pessoaFisicaAtual.setCpf(cpfOuCnpj);
+            this.pessoaFisicaAtual.setIdentidade(new Identidade()); // Inicializa o objeto Identidade
         } else if (VerificadorCP.verificationCnpj(cpfOuCnpj)) {
             this.pessoaJuridicaAtual = new PessoaJuridica();
             this.pessoaJuridicaAtual.setCnpj(cpfOuCnpj);
@@ -61,48 +64,49 @@ public class ControllerAfiliacao {
     }
 
     // Called from "Dados Pessoais" screen
-    public void registrarDadosCompletos(String nome, String sexo, String dataNascimento, String nacionalidade, boolean isPf, boolean isPj, List<Formacao> formacoes) {
-        if (this.entidadeAtual == null) return;
+    public boolean registrarDadosCompletos(String nome, String sexo, String dataNascimento, String nacionalidade) {
+        if (this.entidadeAtual == null) return false;
 
         this.entidadeAtual.setNome(nome);
-        // A senha e o telefone não estão na tela, precisaria adicioná-los.
-        // Por enquanto, vou usar valores padrão.
         this.entidadeAtual.setSenha("senha_padrao"); 
         this.entidadeAtual.setTelefone("000000000");
 
-        if (isPf && this.pessoaFisicaAtual != null) {
+        if (this.pessoaFisicaAtual != null) {
             this.pessoaFisicaAtual.getIdentidade().setSexo(sexo);
-            // A data de nascimento precisa ser convertida de String para Date
-            // this.pessoaFisicaAtual.setDataNascimento(dataNascimento);
+            
+            // Adicionar validação para o formato da data
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            LocalDate localDate = LocalDate.parse(dataNascimento, formatter);
+            this.pessoaFisicaAtual.setDataNascimento(localDate);
+            
             this.pessoaFisicaAtual.getIdentidade().setNacionalidade(nacionalidade);
         }
-        // Lógica para Pessoa Jurídica seria similar
+        return true; // Retorna verdadeiro se tudo ocorreu bem
     }
 
     // Called from "Habilidades" screen
     public void registrarPerfil(List<String> habilidades, List<String> interesses) {
         // Esta lógica depende do candidato já estar inserido no banco para obter o ID.
         // O fluxo ideal seria inserir a entidade/pessoa/candidato primeiro.
-        // Vou adiar a implementação detalhada até que o fluxo de inserção esteja claro.
+        System.out.println("Habilidades selecionadas: " + habilidades);
+        System.out.println("Interesses selecionados: " + interesses);
     }
 
     // Called from "Termo de Aceite" screen
     public void registrarTermoAceite() {
         // Lógica para registrar o aceite do termo.
-        // Também depende do candidato já existir no banco.
+        System.out.println("Termo de aceite registrado.");
     }
 
-    // Called after accepting the term
+    // ✅ CORREÇÃO: Este método agora deve ser chamado APENAS UMA VEZ
     public void finalizarAfilicao(String status, boolean receberAtualizacoes) {
-        // 1. Inserir Entidade e obter ID
-        // 2. Inserir PessoaFisica/Juridica com o ID da entidade
-        // 3. Inserir Candidato com o ID da entidade
-        // 4. Gerar e enviar código de validação
+        System.out.println("\n🔄 Iniciando finalização da afiliação...");
+        System.out.println("Status inicial: " + status);
         
         try (Connection conn = DatabaseConnection.getConnect()) {
             conn.setAutoCommit(false); // Iniciar transação
 
-            // Inserir Entidade
+            // 1. Inserir Entidade
             String sqlEntidade = "INSERT INTO entidade (email, senha, nome, telefone) VALUES (?, ?, ?, ?)";
             try (PreparedStatement pstmt = conn.prepareStatement(sqlEntidade, Statement.RETURN_GENERATED_KEYS)) {
                 pstmt.setString(1, entidadeAtual.getEmail());
@@ -114,55 +118,68 @@ public class ControllerAfiliacao {
                 ResultSet generatedKeys = pstmt.getGeneratedKeys();
                 if (generatedKeys.next()) {
                     entidadeAtual.setId(generatedKeys.getInt(1));
+                    System.out.println("✅ Entidade inserida com ID: " + entidadeAtual.getId());
                 } else {
                     throw new SQLException("Falha ao obter ID da entidade.");
                 }
             }
 
-            // Inserir PessoaFisica ou PessoaJuridica
+            // 2. Inserir PessoaFisica ou PessoaJuridica
             if (pessoaFisicaAtual != null) {
-                String sqlPf = "INSERT INTO pessoa_fisica (cpf, id_entidade, sexo, nacionalidade) VALUES (?, ?, ?, ?)";
+                // ✅ CORREÇÃO: Adicionado data_nascimento
+                String sqlPf = "INSERT INTO pessoa_fisica (cpf, id_entidade, sexo, nacionalidade, data_nascimento) VALUES (?, ?, ?, ?, ?)";
                 try (PreparedStatement pstmt = conn.prepareStatement(sqlPf)) {
                     pstmt.setString(1, pessoaFisicaAtual.getCpf());
                     pstmt.setInt(2, entidadeAtual.getId());
+                    // ✅ CORREÇÃO: Buscar os dados do objeto para inserir
                     pstmt.setString(3, pessoaFisicaAtual.getIdentidade().getSexo());
                     pstmt.setString(4, pessoaFisicaAtual.getIdentidade().getNacionalidade());
-                    // Faltando data de nascimento
-                    pstmt.executeUpdate();
-                }
-            } // Adicionar else if para pessoaJuridicaAtual
+                    
+                    // ✅ CORREÇÃO: Converter e inserir a data de nascimento
+                    pstmt.setDate(5, java.sql.Date.valueOf(pessoaFisicaAtual.getDataNascimento()));
 
-            // Inserir Candidato
+                    pstmt.executeUpdate();
+                    System.out.println("✅ Pessoa Física inserida com CPF: " + pessoaFisicaAtual.getCpf());
+                }
+            } else if (pessoaJuridicaAtual != null) {
+                // Adicionar lógica para CNPJ
+                System.out.println("⚠️ Lógica de Pessoa Jurídica ainda não implementada completamente.");
+            }
+
+            // 3. Inserir Candidato com status correto
             String sqlCandidato = "INSERT INTO candidato (id_entidade, status) VALUES (?, ?)";
             try (PreparedStatement pstmt = conn.prepareStatement(sqlCandidato, Statement.RETURN_GENERATED_KEYS)) {
                 pstmt.setInt(1, entidadeAtual.getId());
-                pstmt.setString(2, status);
+                pstmt.setString(2, status); // ✅ Deve ser "Aguardando Validação"
                 pstmt.executeUpdate();
                 
                 ResultSet generatedKeys = pstmt.getGeneratedKeys();
                 if (generatedKeys.next()) {
                     this.candidatoAtual = new Candidato();
                     candidatoAtual.setId(generatedKeys.getInt(1));
+                    System.out.println("✅ Candidato inserido com ID: " + candidatoAtual.getId() + " | Status: " + status);
                 }
             }
 
+            // 4. Gerar e enviar código de validação DENTRO da transação
+            gerarEEnviarCodigoValidacao(conn);
+
             conn.commit(); // Finalizar transação
-            
-            gerarEEnviarCodigoValidacao();
+            System.out.println("✅ Transação finalizada com sucesso!");
 
         } catch (SQLException e) {
+            System.err.println("❌ Erro ao finalizar afiliação: " + e.getMessage());
             e.printStackTrace();
-            // Rollback em caso de erro
         }
     }
 
-    private void gerarEEnviarCodigoValidacao() {
+    // ✅ CORREÇÃO: Melhor logging para debug
+    private void gerarEEnviarCodigoValidacao(Connection conn) {
         String codigo = UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         LocalDateTime dataExpiracao = LocalDateTime.now().plusHours(1);
 
         String sql = "INSERT INTO validacao (id_entidade, codigo, data_criacao, data_expiracao, status) VALUES (?, ?, ?, ?, 'Pendente')";
-        try (Connection conn = DatabaseConnection.getConnect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
             
             pstmt.setInt(1, entidadeAtual.getId());
             pstmt.setString(2, codigo);
@@ -170,52 +187,86 @@ public class ControllerAfiliacao {
             pstmt.setTimestamp(4, Timestamp.valueOf(dataExpiracao));
             pstmt.executeUpdate();
 
-            // Simular envio de e-mail
-            System.out.println("--- CÓDIGO DE VALIDAÇÃO ---");
-            System.out.println("Para o e-mail: " + entidadeAtual.getEmail());
-            System.out.println("Código: " + codigo);
-            System.out.println("---------------------------");
+            // ✅ CORREÇÃO: Melhor formatação do código no console
+            System.out.println("\n╔════════════════════════════════════════╗");
+            System.out.println("║    📧 CÓDIGO DE VALIDAÇÃO GERADO      ║");
+            System.out.println("╠════════════════════════════════════════╣");
+            System.out.println("║ ID Entidade: " + String.format("%-24s", entidadeAtual.getId()) + "║");
+            System.out.println("║ E-mail: " + String.format("%-30s", entidadeAtual.getEmail()) + "║");
+            System.out.println("║                                        ║");
+            System.out.println("║ ✨ CÓDIGO: [" + codigo + "]            ║");
+            System.out.println("║                                        ║");
+            System.out.println("║ Tamanho: " + codigo.length() + " caracteres                 ║");
+            System.out.println("║ Expira em: " + dataExpiracao.toLocalTime() + "              ║");
+            System.out.println("╚════════════════════════════════════════╝\n");
             
-            // EnvioEmail.enviarEmail(entidadeAtual.getEmail(), "Seu código de validação", "Seu código é: " + codigo);
-
         } catch (SQLException e) {
+            System.err.println("❌ Erro ao gerar código de validação: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    // This is the method the user is having trouble with
+    // ✅ CORREÇÃO: Validação melhorada com logs detalhados
     public boolean validarCodigoEmail(String codigo) {
-        // This method is now stateless and finds the user by the validation code.
+        if (codigo == null || codigo.trim().isEmpty()) {
+            System.err.println("❌ Código vazio ou nulo");
+            return false;
+        }
+        
+        String codigoLimpo = codigo.trim().toUpperCase();
+        System.out.println("\n🔍 Iniciando validação de código...");
+        System.out.println("Código fornecido: [" + codigoLimpo + "]");
+        System.out.println("Tamanho: " + codigoLimpo.length() + " caracteres");
+        
         String sql = "SELECT id_validacao, id_entidade, status, data_expiracao FROM validacao WHERE codigo = ? AND status = 'Pendente'";
         
         try (Connection conn = DatabaseConnection.getConnect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-            pstmt.setString(1, codigo.trim());
-
+            pstmt.setString(1, codigoLimpo);
             ResultSet rs = pstmt.executeQuery();
 
             if (rs.next()) {
                 int idValidacao = rs.getInt("id_validacao");
+                int idEntidade = rs.getInt("id_entidade");
                 LocalDateTime dataExpiracao = rs.getTimestamp("data_expiracao").toLocalDateTime();
 
+                System.out.println("✅ Código encontrado no banco!");
+                System.out.println("ID Validação: " + idValidacao);
+                System.out.println("ID Entidade: " + idEntidade);
+                System.out.println("Data expiração: " + dataExpiracao);
+                System.out.println("Data atual: " + LocalDateTime.now());
+
                 if (LocalDateTime.now().isAfter(dataExpiracao)) {
-                    // Código expirou, atualiza o status
+                    System.err.println("❌ Código expirado!");
                     atualizarStatusCodigo(idValidacao, "Expirado");
                     return false;
                 }
 
-                // Código válido, atualiza o status para 'Utilizado'
+                // ✅ Código válido, atualiza status
+                System.out.println("✅ Código válido! Atualizando status...");
                 atualizarStatusCodigo(idValidacao, "Utilizado");
+                atualizarStatusCandidatoPorEntidade(idEntidade, "Aguardando Aprovação");
                 
-                // Atualiza o status do candidato para 'Ativo'
-                int idEntidade = rs.getInt("id_entidade");
-                //atualizarStatusCandidatoPorEntidade(idEntidade, "Ativo");
-                
+                System.out.println("✅ Validação concluída com sucesso!");
                 return true;
+            } else {
+                System.err.println("❌ Código não encontrado no banco ou status diferente de 'Pendente'");
+                System.err.println("Código procurado: [" + codigoLimpo + "]");
+                
+                // Debug adicional: listar códigos pendentes
+                String debugSql = "SELECT codigo, status FROM validacao WHERE status = 'Pendente' ORDER BY id_validacao DESC LIMIT 5";
+                try (PreparedStatement debugStmt = conn.prepareStatement(debugSql);
+                     ResultSet debugRs = debugStmt.executeQuery()) {
+                    System.err.println("\n📋 Últimos 5 códigos pendentes no banco:");
+                    while (debugRs.next()) {
+                        System.err.println("   - [" + debugRs.getString("codigo") + "] | Status: " + debugRs.getString("status"));
+                    }
+                }
             }
 
         } catch (SQLException e) {
+            System.err.println("❌ Erro SQL na validação: " + e.getMessage());
             e.printStackTrace();
         }
         return false;
@@ -228,7 +279,23 @@ public class ControllerAfiliacao {
             pstmt.setString(1, novoStatus);
             pstmt.setInt(2, idValidacao);
             pstmt.executeUpdate();
+            System.out.println("✅ Status do código atualizado para: " + novoStatus);
         } catch (SQLException e) {
+            System.err.println("❌ Erro ao atualizar status do código: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void atualizarStatusCandidatoPorEntidade(int idEntidade, String novoStatus) {
+        String sql = "UPDATE candidato SET status = ? WHERE id_entidade = ?";
+        try (Connection conn = DatabaseConnection.getConnect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, novoStatus);
+            pstmt.setInt(2, idEntidade);
+            int rowsAffected = pstmt.executeUpdate();
+            System.out.println("✅ Status do candidato atualizado para: " + novoStatus + " (" + rowsAffected + " registro(s) afetado(s))");
+        } catch (SQLException e) {
+            System.err.println("❌ Erro ao atualizar status do candidato: " + e.getMessage());
             e.printStackTrace();
         }
     }

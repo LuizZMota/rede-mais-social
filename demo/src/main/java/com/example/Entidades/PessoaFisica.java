@@ -1,6 +1,8 @@
 package com.example.Entidades;
 
 import java.util.List;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 
 public class PessoaFisica extends Entidade {
@@ -37,5 +39,26 @@ public class PessoaFisica extends Entidade {
     }
     public void setFormacao(List<Formacao> formacoes) {
         this.formacoes = formacoes;
+    }
+
+    /**
+     * Define a data de nascimento no objeto Identidade, convertendo de LocalDate para Date.
+     * @param dataNascimento A data de nascimento como LocalDate.
+     */
+    public void setDataNascimento(LocalDate dataNascimento) {
+        if (this.identidade != null && dataNascimento != null) {
+            this.identidade.setDataNascimento(java.util.Date.from(dataNascimento.atStartOfDay(ZoneId.systemDefault()).toInstant()));
+        }
+    }
+
+    /**
+     * Obtém a data de nascimento do objeto Identidade, convertendo de Date para LocalDate.
+     * @return A data de nascimento como LocalDate, ou null se não existir.
+     */
+    public LocalDate getDataNascimento() {
+        if (this.identidade != null && this.identidade.getDataNascimento() != null) {
+            return this.identidade.getDataNascimento().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        }
+        return null;
     }
 }
