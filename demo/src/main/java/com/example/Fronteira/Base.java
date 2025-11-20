@@ -62,4 +62,33 @@ public class Base extends JFrame {
         button.setFocusPainted(false);
         return button;
     }
+    // ... (parte de cima da classe Base)
+
+    // Método utilitário para criar painel de botões lado a lado (útil para navegação)
+    public JPanel createButtonPanel(JButton left, JButton right) {
+        JPanel panel = new JPanel();
+        panel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 0)); 
+        panel.setOpaque(false);
+        panel.add(left);
+        panel.add(right);
+        panel.setMaximumSize(new Dimension(350, 40));
+        panel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        return panel;
+    }
+
+    // Método utilitário para criar campo de texto padronizado
+    public JTextField createTextField() {
+        JTextField tf = new JTextField();
+        tf.setMaximumSize(new Dimension(300, 30));
+        tf.setAlignmentX(Component.CENTER_ALIGNMENT);
+        return tf;
+    }
+
+    // Método utilitário para criar labels com alinhamento customizado (CENTER ou LEFT)
+    public JLabel createLabel(String text, float alignment) {
+        JLabel label = new JLabel(text);
+        label.setAlignmentX(alignment); // Use Component.LEFT_ALIGNMENT ou Component.CENTER_ALIGNMENT
+        return label;
+    }
+
 }

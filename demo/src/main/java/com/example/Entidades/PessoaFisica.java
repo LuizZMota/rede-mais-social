@@ -1,22 +1,25 @@
 package com.example.Entidades;
 
 import java.util.List;
+import java.util.ArrayList;
 
-public class PessoaFisica extends Entidade{
+public class PessoaFisica extends Entidade {
     private String cpf;
     private Identidade identidade; 
     private List<Formacao> formacoes;
 
     public PessoaFisica(){
-
+        super();
+        this.formacoes = new ArrayList<>();
     }
-    public PessoaFisica(String email, List<Localizacao> localizacoes, String cpf, Identidade identidade,
-            List<Formacao> formacoes) {
-        super(email, localizacoes);
+    
+    public PessoaFisica(String nome, String email, String senha, String telefone, String cpf, Identidade identidade) {
+        super(nome, email, senha, telefone);
         this.cpf = cpf;
         this.identidade = identidade;
-        this.formacoes = formacoes;
+        this.formacoes = new ArrayList<>();
     }
+
     public String getCpf() {
         return cpf;
     }
@@ -35,8 +38,4 @@ public class PessoaFisica extends Entidade{
     public void setFormacao(List<Formacao> formacoes) {
         this.formacoes = formacoes;
     }
-
-    
-
-    
 }

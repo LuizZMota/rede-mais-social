@@ -2,36 +2,30 @@ package com.example.Entidades;
 import java.util.Date;
 
 public class Identidade {
-    private String tipo;
-    private String numero;
-    private Date dataEmissao;
+    private String sexo;
+    private Date dataNascimento;
     private String nacionalidade;
 
+    public Identidade() {
+    }
     
-    public Identidade(String tipo, String numero, Date dataEmissao, String nacionalidade) {
-        this.tipo = tipo;
-        this.numero = numero;
-        this.dataEmissao = dataEmissao;
+    public Identidade(String sexo, Date dataNascimento, String nacionalidade) {
+        this.sexo = sexo;
+        this.dataNascimento = dataNascimento;
         this.nacionalidade = nacionalidade;
     }
     
-    public String getTipo() {
-        return tipo;
+    public String getSexo() {
+        return sexo;
     }
-    public void setTipo(String tipo) {
-        this.tipo = tipo;
+    public void setSexo(String sexo) {
+        this.sexo = sexo;
     }
-    public String getNumero() {
-        return numero;
+    public Date getDataNascimento() {
+        return dataNascimento;
     }
-    public void setNumero(String numero) {
-        this.numero = numero;
-    }
-    public Date getDataEmissao() {
-        return dataEmissao;
-    }
-    public void setDataEmissao(Date dataEmissao) {
-        this.dataEmissao = dataEmissao;
+    public void setDataNascimento(Date dataNascimento) {
+        this.dataNascimento = dataNascimento;
     }
     public String getNacionalidade() {
         return nacionalidade;
@@ -39,6 +33,4 @@ public class Identidade {
     public void setNacionalidade(String nacionalidade) {
         this.nacionalidade = nacionalidade;
     }
-
-    
 }

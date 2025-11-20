@@ -1,18 +1,23 @@
 package com.example.Entidades;
 
 import java.util.List;
+import java.util.ArrayList;
 
-public class PessoaJuridica extends Entidade{
+public class PessoaJuridica extends Entidade {
     private String cnpj;
     private Empresa empresa; 
     private List<Certidoes> certidoes;
 
-    public PessoaJuridica(String email, List<Localizacao> localizacoes, String cnpj, Empresa empresa,
-            List<Certidoes> certidaos) {
-        super(email, localizacoes);
+    public PessoaJuridica() {
+        super();
+        this.certidoes = new ArrayList<>();
+    }
+
+    public PessoaJuridica(String nome, String email, String senha, String telefone, String cnpj, Empresa empresa) {
+        super(nome, email, senha, telefone);
         this.cnpj = cnpj;
         this.empresa = empresa;
-        this.certidoes = certidaos;
+        this.certidoes = new ArrayList<>();
     }
 
     public String getCnpj() {
@@ -30,9 +35,7 @@ public class PessoaJuridica extends Entidade{
     public List<Certidoes> getCertidoes() {
         return certidoes;
     }
-    public void setCertidoes(List<Certidoes> certidaos) {
-        this.certidoes = certidaos;
+    public void setCertidoes(List<Certidoes> certidoes) {
+        this.certidoes = certidoes;
     }
-
-    
 }
