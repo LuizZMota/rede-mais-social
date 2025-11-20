@@ -3,19 +3,22 @@ package com.example.Entidades;
 
 
 public class Habilidades{
-    public String habilidade;
+    public String descricao;
     public String status;
 
-    public Habilidades(String habilidade, String status) {
-        this.habilidade = habilidade;
+    public Habilidades() {
+    }
+
+    public Habilidades(String descricao, String status) {
+        this.descricao = descricao;
         this.status = status;
     }
 
-    public String getHabilidade() {
-        return habilidade;
+    public String getDescricao() {
+        return descricao;
     }
-    public void setHabilidade(String habilidade) {
-        this.habilidade = habilidade;
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
     }
     public String getStatus() {
         return status;

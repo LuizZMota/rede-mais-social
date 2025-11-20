@@ -5,7 +5,10 @@ public class Empresa {
     public String nomeLegal;
     public String nomeFantasia;
     public String pais;
-  
+
+    public Empresa() {
+    }
+
     public Empresa(String registro, String nomeLegal, String nomeFantasia, String pais) {
         this.registro = registro;
         this.nomeLegal = nomeLegal;

@@ -5,11 +5,16 @@ public class Termo {
     private Date dataCriacao;
     private ItemTermo itemTermo; 
     private TemplateTermo templateTermo;
+    private int id;
 
-    public Termo(Date dataCriacao, ItemTermo itemTermo, TemplateTermo templateTermo) {
+    public Termo() {
+    }
+
+    public Termo(Date dataCriacao, ItemTermo itemTermo, TemplateTermo templateTermo,  int id) {
         this.dataCriacao = dataCriacao;
         this.itemTermo = itemTermo;
         this.templateTermo = templateTermo;
+        this.id = id;
     }
 
     public Date getDataCriacao() {
@@ -29,5 +34,11 @@ public class Termo {
     }
     public void setTemplateTermo(TemplateTermo templateTermo) {
         this.templateTermo = templateTermo;
-    }   
+    }
+    public int getId() {
+        return id;
+    }
+    public void setId(int id) {
+        this.id = id;
+    }
 }

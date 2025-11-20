@@ -2,26 +2,30 @@ package com.example.Entidades;
 
 public class Interesses{
     public String status;
-    public String interesses;
+    public String descricao;
 
-    public Interesses(String status, String interesses) {
+    public Interesses(String status, String descricao) {
         super();
         this.status = status;
-        this.interesses = interesses;
+        this.descricao = descricao;
+    }
+
+    public Interesses() {
+    }
+
+    public String getDescricao() {
+        return descricao;
+    }
+
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
     }
 
     public String getStatus() {
         return status;
     }
+
     public void setStatus(String status) {
         this.status = status;
     }
-    public String getInteresses() {
-        return interesses;
-    }
-    public void setInteresses(String interesses) {
-        this.interesses = interesses;
-    }
-
-    
 }

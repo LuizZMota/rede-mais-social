@@ -1,15 +1,17 @@
 package com.example.Entidades;
 import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class Identidade {
     private String sexo;
-    private Date dataNascimento;
+    private LocalDate dataNascimento;
     private String nacionalidade;
 
     public Identidade() {
     }
     
-    public Identidade(String sexo, Date dataNascimento, String nacionalidade) {
+    public Identidade(String sexo, LocalDate dataNascimento, String nacionalidade) {
         this.sexo = sexo;
         this.dataNascimento = dataNascimento;
         this.nacionalidade = nacionalidade;
@@ -21,10 +23,10 @@ public class Identidade {
     public void setSexo(String sexo) {
         this.sexo = sexo;
     }
-    public Date getDataNascimento() {
+    public LocalDate getDataNascimento() {
         return dataNascimento;
     }
-    public void setDataNascimento(Date dataNascimento) {
+    public void setDataNascimento(LocalDate dataNascimento) {
         this.dataNascimento = dataNascimento;
     }
     public String getNacionalidade() {

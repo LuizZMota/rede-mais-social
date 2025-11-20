@@ -9,7 +9,7 @@ public class Entidade {
     private String email;
     private String senha;
     private String telefone;
-    private List<Localizacao> localizacoes = new ArrayList<>();
+    private List<Endereco> localizacoes = new ArrayList<>();
 
     public Entidade() {
     }
@@ -63,11 +63,11 @@ public class Entidade {
         this.telefone = telefone;
     }
 
-    public List<Localizacao> getLocalizacoes() {
+    public List<Endereco> getLocalizacoes() {
         return localizacoes;
     }
 
-    public void setLocalizacoes(List<Localizacao> localizacoes) {
+    public void setLocalizacoes(List<Endereco> localizacoes) {
         this.localizacoes = localizacoes;
     }
 }
