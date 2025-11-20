@@ -97,6 +97,7 @@ public class FronteiraAfiliacao extends Base {
         radioCpf = new JRadioButton("Pessoa Física (CPF)");
         radioCpf.setSelected(true);
         radioCnpj = new JRadioButton("Pessoa Jurídica (CNPJ)");
+        radioCnpj.setSelected(true);
         ButtonGroup group = new ButtonGroup();
         group.add(radioCpf);
         group.add(radioCnpj);
