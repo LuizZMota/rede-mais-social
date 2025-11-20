@@ -45,7 +45,7 @@ public class ControllerAfiliacao {
         }
         return false;
     }
-//ssssssssssssssssssssssss
+//aaaaaaaaa
     // Called if buscarCandidatoExistente is false
     public void iniciarNovoCandidato(String cpfOuCnpj, String email) {
         this.entidadeAtual = new Entidade();
