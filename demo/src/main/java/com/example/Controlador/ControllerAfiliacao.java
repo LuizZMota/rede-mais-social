@@ -38,6 +38,14 @@ public class ControllerAfiliacao {
                 this.entidadeAtual = new Entidade();
                 this.entidadeAtual.setId(idEntidade);
                 this.entidadeAtual.setEmail(email);
+
+                // ✅ CORREÇÃO: Recriar o objeto PF/PJ para manter o estado
+                if (VerificadorCP.VerificationCpf(cpfOuCnpj)) {
+                    this.pessoaFisicaAtual = new PessoaFisica();
+                    this.pessoaFisicaAtual.setCpf(cpfOuCnpj);
+                } else if (VerificadorCP.verificationCnpj(cpfOuCnpj)) {
+                    this.pessoaJuridicaAtual = new PessoaJuridica();
+                }
                 
                 gerarEEnviarCodigoValidacao(conn); // ✅ CORREÇÃO: Passar a conexão existente
                 return true;
@@ -52,19 +60,17 @@ public class ControllerAfiliacao {
     public void iniciarNovoCandidato(String cpfOuCnpj, String email) {
         this.entidadeAtual = new Entidade();
         this.entidadeAtual.setEmail(email);
-
+        
+        // Focando apenas no fluxo de Pessoa Física, como solicitado.
         if (VerificadorCP.VerificationCpf(cpfOuCnpj)) {
             this.pessoaFisicaAtual = new PessoaFisica();
             this.pessoaFisicaAtual.setCpf(cpfOuCnpj);
             this.pessoaFisicaAtual.setIdentidade(new Identidade()); // Inicializa o objeto Identidade
-        } else if (VerificadorCP.verificationCnpj(cpfOuCnpj)) {
-            this.pessoaJuridicaAtual = new PessoaJuridica();
-            this.pessoaJuridicaAtual.setCnpj(cpfOuCnpj);
         }
     }
 
     // Called from "Dados Pessoais" screen
-    public boolean registrarDadosCompletos(String nome, String sexo, String dataNascimento, String nacionalidade) {
+    public boolean registrarDadosCompletos(String nome, String sexo, String dataNascimento, String nacionalidade, String profissao) {
         if (this.entidadeAtual == null) return false;
 
         this.entidadeAtual.setNome(nome);
@@ -80,6 +86,7 @@ public class ControllerAfiliacao {
             this.pessoaFisicaAtual.setDataNascimento(localDate);
             
             this.pessoaFisicaAtual.getIdentidade().setNacionalidade(nacionalidade);
+            this.pessoaFisicaAtual.setProfissao(profissao); // ✅ ARMAZENAR PROFISSÃO
         }
         return true; // Retorna verdadeiro se tudo ocorreu bem
     }
@@ -127,16 +134,16 @@ public class ControllerAfiliacao {
             // 2. Inserir PessoaFisica ou PessoaJuridica
             if (pessoaFisicaAtual != null) {
                 // ✅ CORREÇÃO: Adicionado data_nascimento
-                String sqlPf = "INSERT INTO pessoa_fisica (cpf, id_entidade, sexo, nacionalidade, data_nascimento) VALUES (?, ?, ?, ?, ?)";
+                String sqlPf = "INSERT INTO pessoa_fisica (cpf, id_entidade, sexo, nacionalidade, data_nascimento, profissao) VALUES (?, ?, ?, ?, ?, ?)";
                 try (PreparedStatement pstmt = conn.prepareStatement(sqlPf)) {
                     pstmt.setString(1, pessoaFisicaAtual.getCpf());
                     pstmt.setInt(2, entidadeAtual.getId());
                     // ✅ CORREÇÃO: Buscar os dados do objeto para inserir
                     pstmt.setString(3, pessoaFisicaAtual.getIdentidade().getSexo());
                     pstmt.setString(4, pessoaFisicaAtual.getIdentidade().getNacionalidade());
-                    
                     // ✅ CORREÇÃO: Converter e inserir a data de nascimento
                     pstmt.setDate(5, java.sql.Date.valueOf(pessoaFisicaAtual.getDataNascimento()));
+                    pstmt.setString(6, pessoaFisicaAtual.getProfissao()); // ✅ INSERIR PROFISSÃO
 
                     pstmt.executeUpdate();
                     System.out.println("✅ Pessoa Física inserida com CPF: " + pessoaFisicaAtual.getCpf());

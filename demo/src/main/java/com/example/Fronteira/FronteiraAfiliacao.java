@@ -2,10 +2,8 @@ package com.example.Fronteira;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.Arrays;
 import java.util.List;
 import com.example.Controlador.ControllerAfiliacao;
-import com.example.Entidades.Formacao;
 
 public class FronteiraAfiliacao extends Base {
 
@@ -97,6 +95,7 @@ public class FronteiraAfiliacao extends Base {
         radioCpf = new JRadioButton("Pessoa Física (CPF)");
         radioCpf.setSelected(true);
         radioCnpj = new JRadioButton("Pessoa Jurídica (CNPJ)");
+        radioCnpj.setEnabled(false); // Desabilita a opção CNPJ
         ButtonGroup group = new ButtonGroup();
         group.add(radioCpf);
         group.add(radioCnpj);
@@ -119,6 +118,7 @@ public class FronteiraAfiliacao extends Base {
                 cardLayout.show(mainContent, TELA_CNPJ);
             }
         });
+        btnProximaEtapa.addActionListener(e -> cardLayout.show(mainContent, TELA_CPF));
         panel.add(btnProximaEtapa);
         
         panel.add(Box.createVerticalGlue());
@@ -238,7 +238,7 @@ public class FronteiraAfiliacao extends Base {
             String profissao = txtProfissao.getText(); 
             
             // ✅ CORREÇÃO: Verificar se os dados foram registrados com sucesso
-            if (controller.registrarDadosCompletos(nome, sexo, dataNascimento, nacionalidade)) {
+            if (controller.registrarDadosCompletos(nome, sexo, dataNascimento, nacionalidade, profissao)) {
                 setTitle("Afiliação - Etapa 3/4");
                 cardLayout.show(mainContent, TELA_ENDERECO_RESIDENCIAL);
             } else {
@@ -254,6 +254,7 @@ public class FronteiraAfiliacao extends Base {
                 cardLayout.show(mainContent, TELA_CNPJ);
             }
         });
+        btnVoltar.addActionListener(e -> cardLayout.show(mainContent, TELA_CPF));
         
         panel.add(createButtonPanel(btnVoltar, btnProximaEtapa));
         panel.add(Box.createVerticalGlue());
@@ -357,7 +358,6 @@ public class FronteiraAfiliacao extends Base {
 
         btnProximaEtapa = createButton("Próxima Etapa", new Color(60, 179, 113));
         btnProximaEtapa.addActionListener(e -> {
-            List<String> selectedInteresses = listInteresses.getSelectedValuesList();
             setTitle("Afiliação - Etapa 3/4");
             cardLayout.show(mainContent, TELA_HABILIDADES);
         });

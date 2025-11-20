@@ -9,6 +9,7 @@ public class PessoaFisica extends Entidade {
     private String cpf;
     private Identidade identidade; 
     private List<Formacao> formacoes;
+    private String profissao; // ✅ NOVO CAMPO
 
     public PessoaFisica(){
         super();
@@ -39,6 +40,14 @@ public class PessoaFisica extends Entidade {
     }
     public void setFormacao(List<Formacao> formacoes) {
         this.formacoes = formacoes;
+    }
+
+    public String getProfissao() {
+        return profissao;
+    }
+
+    public void setProfissao(String profissao) {
+        this.profissao = profissao;
     }
 
     /**
