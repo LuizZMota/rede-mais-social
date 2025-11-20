@@ -51,10 +51,10 @@ public class ControllerAfiliacao {
         this.entidadeAtual = new Entidade();
         this.entidadeAtual.setEmail(email);
 
-        if (VerificadorCP.isCPF(cpfOuCnpj)) {
+        if (VerificadorCP.VerificationCpf(cpfOuCnpj)) {
             this.pessoaFisicaAtual = new PessoaFisica();
             this.pessoaFisicaAtual.setCpf(cpfOuCnpj);
-        } else if (VerificadorCP.isCNPJ(cpfOuCnpj)) {
+        } else if (VerificadorCP.verificationCnpj(cpfOuCnpj)) {
             this.pessoaJuridicaAtual = new PessoaJuridica();
             this.pessoaJuridicaAtual.setCnpj(cpfOuCnpj);
         }
@@ -71,10 +71,10 @@ public class ControllerAfiliacao {
         this.entidadeAtual.setTelefone("000000000");
 
         if (isPf && this.pessoaFisicaAtual != null) {
-            this.pessoaFisicaAtual.setSexo(sexo);
+            this.pessoaFisicaAtual.getIdentidade().setSexo(sexo);
             // A data de nascimento precisa ser convertida de String para Date
             // this.pessoaFisicaAtual.setDataNascimento(dataNascimento);
-            this.pessoaFisicaAtual.setNacionalidade(nacionalidade);
+            this.pessoaFisicaAtual.getIdentidade().setNacionalidade(nacionalidade);
         }
         // Lógica para Pessoa Jurídica seria similar
     }
@@ -125,8 +125,8 @@ public class ControllerAfiliacao {
                 try (PreparedStatement pstmt = conn.prepareStatement(sqlPf)) {
                     pstmt.setString(1, pessoaFisicaAtual.getCpf());
                     pstmt.setInt(2, entidadeAtual.getId());
-                    pstmt.setString(3, pessoaFisicaAtual.getSexo());
-                    pstmt.setString(4, pessoaFisicaAtual.getNacionalidade());
+                    pstmt.setString(3, pessoaFisicaAtual.getIdentidade().getSexo());
+                    pstmt.setString(4, pessoaFisicaAtual.getIdentidade().getNacionalidade());
                     // Faltando data de nascimento
                     pstmt.executeUpdate();
                 }
@@ -210,7 +210,7 @@ public class ControllerAfiliacao {
                 
                 // Atualiza o status do candidato para 'Ativo'
                 int idEntidade = rs.getInt("id_entidade");
-                atualizarStatusCandidatoPorEntidade(idEntidade, "Ativo");
+                //atualizarStatusCandidatoPorEntidade(idEntidade, "Ativo");
                 
                 return true;
             }
